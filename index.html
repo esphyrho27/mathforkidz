@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Quest: Fun Math Adventure for Kids!</title>
+  <!-- Playful, rounded font for kids -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Canvas for Confetti effects -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="app-container">
+    
+    <!-- 1. HOME SCREEN (Start Menu & Game Setup) -->
+    <div id="home-screen" class="view-section active">
+      <header class="home-header">
+        <h1 class="logo-title">✨ Math for Kids ✨</h1>
+        <p class="home-tagline">Choose your level and operation, then press Play!</p>
+        
+        <!-- High Score Challenge Banner -->
+        <div class="challenge-banner" id="home-challenge-banner">
+          <span class="banner-icon">👑</span>
+          Current High Score: <strong id="challenge-winner">Emma — 185 points</strong>. Can you beat it?
+        </div>
+      </header>
+
+      <main class="home-config-card card">
+        <div class="config-sections-grid">
+          <!-- Level Selection -->
+          <div class="config-column">
+            <h2 class="panel-title">🎚️ Choose Level</h2>
+            <div class="difficulty-selector">
+              <button class="diff-btn active" data-diff="easy" id="diff-easy">
+                <span class="diff-dot easy"></span> Easy (0-4)
+              </button>
+              <button class="diff-btn" data-diff="medium" id="diff-medium">
+                <span class="diff-dot medium"></span> Medium (5-7)
+              </button>
+              <button class="diff-btn" data-diff="hard" id="diff-hard">
+                <span class="diff-dot hard"></span> Hard (8-10)
+              </button>
+            </div>
+          </div>
+
+          <!-- Operator Selection -->
+          <div class="config-column">
+            <h2 class="panel-title">➕ Choose Operator</h2>
+            <div class="operator-selector">
+              <button class="op-btn active" data-op="add" id="op-add">
+                <span class="op-icon">➕</span> Addition
+              </button>
+              <button class="op-btn" data-op="subtract" id="op-subtract">
+                <span class="op-icon">➖</span> Subtraction
+              </button>
+              <button class="op-btn" data-op="multiply" id="op-multiply">
+                <span class="op-icon">✖️</span> Multiplication
+              </button>
+              <button class="op-btn" data-op="divide" id="op-divide">
+                <span class="op-icon">➗</span> Division
+              </button>
+              <button class="op-btn" data-op="random" id="op-random">
+                <span class="op-icon">🎲</span> Mixed Mix
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="home-actions">
+          <button class="home-action-btn start-play-btn" id="play-button">
+            ▶️ PLAY GAME
+          </button>
+          <button class="home-action-btn show-scores-btn" id="home-leaderboard-btn">
+            📊 LEADERBOARD
+          </button>
+        </div>
+
+        <div class="home-footer">
+          <button class="sound-btn" id="home-sound-toggle" aria-label="Toggle Sound">
+            <span class="icon" id="home-sound-icon">🔊</span>
+          </button>
+          <button class="reset-btn" id="reset-stats">Reset All Progress 🔄</button>
+        </div>
+      </main>
+    </div>
+
+    <!-- 2. GAMEPLAY SCREEN -->
+    <div id="game-screen" class="view-section">
+      <header class="game-header">
+        <button class="back-home-btn" id="game-home-btn" title="Back to Home Menu">
+          🏠 Home
+        </button>
+        
+        <div class="dashboard">
+          <div class="dashboard-stat streak-box" id="streak-stat" title="Current streak">
+            <span class="icon">🔥</span>
+            <span class="value" id="streak-count">0</span>
+          </div>
+          
+          <div class="dashboard-stat score-box" id="score-stat" title="Total score">
+            <span class="icon">⭐</span>
+            <span class="value" id="score-count">0</span>
+          </div>
+
+          <div class="dashboard-stat highscore-box" id="highscore-stat" title="High streak">
+            <span class="icon">🏆</span>
+            <span class="value" id="highscore-count">0</span>
+          </div>
+
+          <button class="sound-btn" id="game-sound-toggle" aria-label="Toggle Sound">
+            <span class="icon" id="game-sound-icon">🔊</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Timer bar -->
+      <div class="timer-container" id="timer-bar-container">
+        <div class="timer-label">Time Left: <span id="timer-seconds">20</span>s</div>
+        <div class="timer-track">
+          <div class="timer-fill" id="timer-progress"></div>
+        </div>
+      </div>
+
+      <div class="main-layout-game">
+        <main class="playground">
+          <!-- Question Card -->
+          <section class="question-card card" id="question-container">
+            <div class="quest-tag" id="difficulty-badge">Easy Level</div>
+            
+            <div class="equation-display">
+              <!-- Generated numbers are display-only (read-only) -->
+              <span class="num-display" id="display-op1">?</span>
+              <span class="operator" id="math-op">?</span>
+              <span class="num-display" id="display-op2">?</span>
+              <span class="equals">=</span>
+              <div class="input-wrapper">
+                <input type="number" pattern="[0-9]*" inputmode="numeric" id="answer-input" placeholder="?" autocomplete="off">
+              </div>
+            </div>
+            
+            <div class="feedback-container">
+              <p class="feedback-text" id="feedback-message">Click "Generate Numbers" to start the quest!</p>
+            </div>
+          </section>
+
+          <!-- Keypad & Controls -->
+          <section class="controls-area">
+            <div class="action-buttons">
+              <button class="action-btn generate-btn" id="generate-trigger">
+                🎲 Generate Numbers
+              </button>
+              <button class="action-btn hint-btn" id="hint-trigger" disabled>
+                💡 Need a Hint?
+              </button>
+              <button class="action-btn check-btn" id="check-trigger" disabled>
+                ✅ Submit Answer
+              </button>
+            </div>
+
+            <!-- Virtual Keypad -->
+            <div class="keypad-card card">
+              <div class="keypad-grid">
+                <button class="key-btn" data-val="1">1</button>
+                <button class="key-btn" data-val="2">2</button>
+                <button class="key-btn" data-val="3">3</button>
+                <button class="key-btn" data-val="4">4</button>
+                <button class="key-btn" data-val="5">5</button>
+                <button class="key-btn" data-val="6">6</button>
+                <button class="key-btn" data-val="7">7</button>
+                <button class="key-btn" data-val="8">8</button>
+                <button class="key-btn" data-val="9">9</button>
+                <button class="key-btn danger-key" data-val="clear" id="key-clear">C</button>
+                <button class="key-btn" data-val="0">0</button>
+                <button class="key-btn action-key" data-val="backspace" id="key-back">⌫</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Hint Section -->
+          <section class="hint-section card hidden" id="hint-box">
+            <div class="hint-header">
+              <h3 class="hint-title">💡 Helper Board</h3>
+              <button class="close-hint-btn" id="close-hint">×</button>
+            </div>
+            <div class="hint-content" id="hint-visuals"></div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <!-- 3. GAME OVER SCREEN -->
+    <div id="game-over-screen" class="view-section">
+      <main class="game-over-card card">
+        <h2 id="game-over-title">🎮 Game Over!</h2>
+        
+        <div class="game-over-stats">
+          <p class="stat-line">Your Final Score: <span id="go-final-score" class="highlight-val">0</span> points</p>
+          <p class="stat-line">Difficulty Level: <span id="go-level-played" class="highlight-val">Easy</span></p>
+          <p class="stat-line">Operation Played: <span id="go-operator-used" class="highlight-val">Addition</span></p>
+          <p class="challenge-status-msg" id="go-challenge-status"></p>
+        </div>
+        
+        <!-- Leaderboard qualifying section -->
+        <div id="go-leaderboard-qualify-section" class="qualify-section hidden">
+          <div class="badge">🎉 TOP SCORE!</div>
+          <p class="qualify-text">You earned a spot on the leaderboard! Enter your name:</p>
+          <input type="text" id="go-player-name-input" maxlength="20" placeholder="Your Name" autocomplete="off">
+        </div>
+        
+        <div class="modal-buttons">
+          <button class="modal-action-btn play-again-btn" id="go-play-again">PLAY AGAIN 🔄</button>
+          <button class="modal-action-btn view-scores-btn" id="go-leaderboard">LEADERBOARD 🏆</button>
+        </div>
+
+        <div class="game-over-footer">
+          <button class="back-home-btn go-menu-btn" id="go-home">
+            🏠 Return to Home Menu
+          </button>
+        </div>
+      </main>
+    </div>
+
+  </div> <!-- End App Container -->
+
+  <!-- Global Leaderboard Modal Overlay -->
+  <div class="modal-overlay hidden" id="leaderboard-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title">🏆 Math Quest Leaderboard</h2>
+        <button class="close-modal-btn" id="close-leaderboard" aria-label="Close modal">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-container">
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Player Name</th>
+                <th>Score</th>
+                <th>Level</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-rows">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="clear-leaderboard-btn" id="clear-leaderboard">Clear Leaderboard 🗑️</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
